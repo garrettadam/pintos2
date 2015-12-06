@@ -30,6 +30,8 @@ process_execute (const char *file_name)
 {
   char *fn_copy;
   tid_t tid;
+	
+	char *pointer;
 
   /* Make a copy of FILE_NAME.
      Otherwise there's a race between the caller and load(). */
@@ -37,6 +39,8 @@ process_execute (const char *file_name)
   if (fn_copy == NULL)
     return TID_ERROR;
   strlcpy (fn_copy, file_name, PGSIZE);
+
+	file_name = strtok_r((char *) file_name, " ", &pointer); //set filename to the first token
 
   /* Create a new thread to execute FILE_NAME. */
   tid = thread_create (file_name, PRI_DEFAULT, start_process, fn_copy);
@@ -53,6 +57,9 @@ start_process (void *file_name_)
   char *file_name = file_name_;
   struct intr_frame if_;
   bool success;
+
+	char *pointer;
+	file_name = strtok_r(file_name, " ", &pointer);
 
   /* Initialize interrupt frame and load executable. */
   memset (&if_, 0, sizeof if_);
@@ -88,6 +95,10 @@ start_process (void *file_name_)
 int
 process_wait (tid_t child_tid UNUSED) 
 {
+	//temporary infinite loop
+	bool tmp = true;
+	while(tmp){
+	}
   return -1;
 }
 
