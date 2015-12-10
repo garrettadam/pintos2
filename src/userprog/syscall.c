@@ -4,11 +4,11 @@
 #include "threads/interrupt.h"
 #include "threads/thread.h"
 #include "devices/shutdown.h"
-
+ 
 static void syscall_handler (struct intr_frame *);
 void halt(void);
 void exit(int status);
-pid_t exec(int status);
+pid_t exec(const char *cmd_line );
 int wait(pid_t pid);
 bool create(const char *file, unsigned initial_size);
 bool remove(const char *file);
