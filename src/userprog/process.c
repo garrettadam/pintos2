@@ -99,9 +99,9 @@ process_wait (tid_t child_tid UNUSED)
 {
 	// child process stuff
 	//temporary infinite loop
-	bool tmp = true;
+	/*bool tmp = true;
 	while(tmp){
-	}
+	}*/
   return -1;
 }
 
@@ -462,17 +462,18 @@ setup_stack (void **esp, const char* file_name, char** pointer)
     }
 	
 	char *cur = strtok_r(NULL, " " , &pointer);
-	char **arguments = malloc(2*sizeof(char*));
-	int i, count = 0, arguments_size = 2;
+	char **argv = malloc(2*sizeof(char*));
+	int argc = 0;
+	int argv_size = 2;
 	
 	// set up stack looping through each token (argument) beyond the first
 	while(cur != NULL){
 		*esp = *esp - strlen(cur)+1;
-		arguments[count] = *esp;
-		count = count +1;
-		if(count >= arguments_size){
-			arguments_size = arguments_size * 2;
-			arguments = realloc(arguments, arguments_size*sizeof(char*));
+		argv[argc] = *esp;
+		argc = argc +1;
+		if(argc >= argv_size){
+			argv_size = argv_size * 2;
+			argv = realloc(argv, argv_size*sizeof(char*));
 		}
 		memcpy(*esp, cur, strlen(cur) + 1);
 
@@ -480,16 +481,16 @@ setup_stack (void **esp, const char* file_name, char** pointer)
 	}
 
 	cur = *esp;
-	*esp = *esp = sizeof(char **);
+	*esp = *esp - sizeof(char **);
 	memcpy(*esp, &cur, sizeof(char **));
 
 	*esp = *esp - sizeof(int);
-	memcpy(*esp, &count, sizeof(int));
+	memcpy(*esp, &argc, sizeof(int));
 
 	*esp = *esp - sizeof(void *);
-	memcpy(*esp, &arguments[count], sizeof(void*));
+	memcpy(*esp, &argv[argc], sizeof(void*));
 
-	free(arguments);
+	free(argv);
 
 	
 	return success;
