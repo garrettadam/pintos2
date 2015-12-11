@@ -102,12 +102,8 @@ struct thread
     /* Owned by userprog/process.c. */
     uint32_t *pagedir;                  /* Page directory. */
 
-	//Process termination message?
-	int exit_code;
-	struct child_process *cp;
-
-
-	struct inf *info;
+	struct inf *info; // Information about process 
+	struct list children; // List of child processes
 
 
 #endif
@@ -115,6 +111,16 @@ struct thread
     /* Owned by thread.c. */
     unsigned magic;                     /* Detects stack overflow. */
   };
+
+struct inf
+{
+	pid_t pid;
+	bool waiting;
+	bool exited;
+	int ex_status;
+	struct lock wait;
+	struct list_elem elem; 
+};
 
 /* If false (default), use round-robin scheduler.
    If true, use multi-level feedback queue scheduler.
