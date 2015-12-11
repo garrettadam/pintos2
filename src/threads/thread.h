@@ -5,6 +5,11 @@
 #include <list.h>
 #include <stdint.h>
 
+//For syscall
+struct inf{
+	int ex_status;
+};
+
 /* States in a thread's life cycle. */
 enum thread_status
   {
@@ -100,6 +105,10 @@ struct thread
 	//Process termination message?
 	int exit_code;
 	struct child_process *cp;
+
+
+	struct inf *info;
+
 
 #endif
 
