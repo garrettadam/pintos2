@@ -5,9 +5,17 @@
 #include <list.h>
 #include <stdint.h>
 
-//For syscall
-struct inf{
+typedef int pid_t;
+//for syscall
+struct lock;
+struct inf
+{
+	pid_t pid;
+	bool waiting;
+	bool exited;
 	int ex_status;
+	struct lock *wait;
+	struct list_elem elem; 
 };
 
 /* States in a thread's life cycle. */
@@ -112,15 +120,6 @@ struct thread
     unsigned magic;                     /* Detects stack overflow. */
   };
 
-struct inf
-{
-	pid_t pid;
-	bool waiting;
-	bool exited;
-	int ex_status;
-	struct lock wait;
-	struct list_elem elem; 
-};
 
 /* If false (default), use round-robin scheduler.
    If true, use multi-level feedback queue scheduler.
