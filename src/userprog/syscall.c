@@ -6,6 +6,7 @@
 #include "devices/shutdown.h"
  
 static void syscall_handler (struct intr_frame *);
+// Syscall Function prototypes
 void halt(void);
 void exit(int status);
 pid_t exec(const char *cmd_line );
@@ -19,7 +20,8 @@ int write(int fd, const void *buffer, unsigned size);
 void seek(int fd, unsigned position);
 unsigned tell(int fd);
 void close(int fd);
-
+// Helper function prototypes
+bool is_valid_ptr(const void *vaddr); 
 
 void
 syscall_init (void) 
@@ -114,6 +116,10 @@ pid_t exec(const char *cmd_line){
 
 int wait(pid_t pid)
 {
+	while(1)
+	{
+	}	
+
 }
 
 bool create(const char*file, unsigned initial_size)
@@ -152,3 +158,16 @@ void close(int fd)
 {
 }
 
+// Checks to see if pointer is valid  
+bool is_valid_ptr(const void *vaddr)
+{
+	if(is_user_vaddr(vaddr))
+	{
+		return true;
+	}
+
+	else
+	{
+		return false;
+	}
+} 
