@@ -43,6 +43,7 @@ process_execute (const char *file_name)
 	file_name = strtok_r((char *) file_name, " ", &pointer); //set filename to the first token
 
   /* Create a new thread to execute FILE_NAME. */
+	printf("Test execute\n");
   tid = thread_create (file_name, PRI_DEFAULT, start_process, fn_copy);
   if (tid == TID_ERROR)
     palloc_free_page (fn_copy); 
@@ -54,6 +55,7 @@ process_execute (const char *file_name)
 static void
 start_process (void *file_name_)
 {
+	printf("Test start\n");
   char *file_name = file_name_;
   struct intr_frame if_;
   bool success;
@@ -97,11 +99,12 @@ start_process (void *file_name_)
 int
 process_wait (tid_t child_tid UNUSED) 
 {
+	printf("Process is waiting\n");
 	// child process stuff
 	//temporary infinite loop
-	/*bool tmp = true;
+	bool tmp = true;
 	while(tmp){
-	}*/
+	}
   return -1;
 }
 
@@ -109,6 +112,7 @@ process_wait (tid_t child_tid UNUSED)
 void
 process_exit (void)
 {
+	printf("Test exit \n");
   struct thread *cur = thread_current ();
   uint32_t *pd;
 
@@ -225,6 +229,7 @@ static bool load_segment (struct file *file, off_t ofs, uint8_t *upage,
 bool
 load (const char *file_name, void (**eip) (void), void **esp, char **pointer) 
 {
+	printf("Test load\n");
   struct thread *t = thread_current ();
   struct Elf32_Ehdr ehdr;
   struct file *file = NULL;
@@ -237,17 +242,18 @@ load (const char *file_name, void (**eip) (void), void **esp, char **pointer)
   if (t->pagedir == NULL) 
     goto done;
   process_activate ();
-
+	printf("Load Test 1\n");
   /* Open executable file. */
   file = filesys_open (file_name);
+	printf("Load Test 2\n");
   if (file == NULL) 
     {
       printf ("load: %s: open failed\n", file_name);
       goto done; 
     }
-
+	printf("Load Test 3\n");
   /* Read and verify executable header. */
-  if (file_read (file, &ehdr, sizeof ehdr) != sizeof ehdr
+  /*if (file_read (file, &ehdr, sizeof ehdr) != sizeof ehdr
       || memcmp (ehdr.e_ident, "\177ELF\1\1\1", 7)
       || ehdr.e_type != 2
       || ehdr.e_machine != 3
@@ -257,10 +263,49 @@ load (const char *file_name, void (**eip) (void), void **esp, char **pointer)
     {
       printf ("load: %s: error loading executable\n", file_name);
       goto done; 
-    }
+	
+    }*/
+
+if(file_read (file, &ehdr, sizeof ehdr) != sizeof ehdr){
+	printf("1\n");
+      printf ("load: %s: error loading executable\n", file_name);
+      goto done; 
+}
+if(!memcmp (ehdr.e_ident, "\177ELF\1\1\1", 7)){
+		printf("2\n");
+      printf ("load: %s: error loading executable\n", file_name);
+      goto done; 
+}
+if(ehdr.e_type != 2){
+		printf("3\n");
+      printf ("load: %s: error loading executable\n", file_name);
+      goto done; 
+}
+if(ehdr.e_machine != 3){
+		printf("4\n");
+      printf ("load: %s: error loading executable\n", file_name);
+      goto done; 
+}
+if(ehdr.e_version != 1){
+		printf("5\n");
+      printf ("load: %s: error loading executable\n", file_name);
+      goto done; 
+}
+if(ehdr.e_phentsize != sizeof (struct Elf32_Phdr)){
+		printf("6\n");
+      printf ("load: %s: error loading executable\n", file_name);
+      goto done; 
+}
+if(ehdr.e_phnum > 1024){
+		printf("7\n");
+      printf ("load: %s: error loading executable\n", file_name);
+      goto done; 
+}
+
 
   /* Read program headers. */
   file_ofs = ehdr.e_phoff;
+		printf("Load Test 4\n");
   for (i = 0; i < ehdr.e_phnum; i++) 
     {
       struct Elf32_Phdr phdr;
@@ -317,7 +362,7 @@ load (const char *file_name, void (**eip) (void), void **esp, char **pointer)
           break;
         }
     }
-
+	printf("Before setup stack\n");
   /* Set up stack. */
   if (!setup_stack (esp, file_name, pointer))
     goto done;
@@ -446,6 +491,7 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
 static bool
 setup_stack (void **esp, const char* file_name, char** pointer) 
 {
+	printf("TEST 1");
   uint8_t *kpage;
   bool success = false;
 
@@ -491,7 +537,9 @@ setup_stack (void **esp, const char* file_name, char** pointer)
 	memcpy(*esp, &argv[argc], sizeof(void*));
 
 	free(argv);
+	
 	hex_dump(*esp, *esp, PHYS_BASE - *esp, true);
+	printf("TEST 2");
 	
 	return success;
 
