@@ -22,8 +22,8 @@ void seek(int fd, unsigned position);
 unsigned tell(int fd);
 void close(int fd);
 // Helper function prototypes
-bool is_valid_ptr(const void *vaddr); 
-
+bool is_valid_ptr(const void *vaddr); // Checks to see that ptr is pointing to user space addr
+int argument(struct intr_frame *f, int num);// Gets argument from stack, num is the argument number 1-3
 void
 syscall_init (void) 
 {
@@ -44,51 +44,60 @@ syscall_handler (struct intr_frame *f)
 			break;
 	
 		case SYS_EXIT:
-			printf("exit");
+			arg1 = argument(f, 1);
+			exit(arg1);
 			break;
 
 		case SYS_EXEC:
-			printf("execute call");
+			arg1 = argument(f, 1);
+			
 			break;
 
 		case SYS_WAIT:
-			printf("wait");
+			arg1 = argument(f, 1);
 			break;
 
 		case SYS_CREATE:
-			printf("create");
+			arg1 = argument(f, 1);
+			arg2 = argument(f, 2);
+			
 			break;
 
 		case SYS_REMOVE:
-			printf("remove");
+			arg1 = argument(f, 1);
 			break;
 
 		case SYS_OPEN:
-			printf("open");
+			arg1 = argument(f, 1);
 			break;
 
 		case SYS_FILESIZE:
-			printf("filesize");
+			arg1 = argument(f, 1);
 			break;
 
 		case SYS_READ:
-			printf("read");
+			arg1 = argument(f, 1);
+			arg2 = argument(f, 2);
+			arg3 = argument(f, 3);
 			break;
 
 		case SYS_WRITE:
-			printf("write");
+			arg1 = argument(f, 1);
+			arg2 = argument(f, 2);
+			arg3 = argument(f, 3);	
 			break;
 
 		case SYS_SEEK:
-			printf("seek");
+			arg1 = argument(f, 1);
+			arg2 = argument(f, 2);
 			break;
 
 		case SYS_TELL:
-			printf("tell");
+			arg1 = argument(f, 1);
 			break;
 
 		case SYS_CLOSE:
-			printf("close");
+			arg1 = argument(f, 1);
 			break;
 
 		default:
@@ -96,7 +105,9 @@ syscall_handler (struct intr_frame *f)
 			exit(-1);
 			break;
 	}
+
 	thread_exit();
+
 }
 
 void halt(void)
@@ -114,7 +125,12 @@ void exit(int status)
 
 pid_t exec(const char *cmd_line)
 {
-	
+	pid_t pid;
+	pid = (pid_t) process_execute(cmd_line);
+	if(pid == -1)
+	{
+		return -1;
+	}	
 }
 
 int wait(pid_t pid)
@@ -170,4 +186,10 @@ bool is_valid_ptr(const void *vaddr)
 	{
 		return false;
 	}
-} 
+}
+
+// Gets argument data from stack
+int argument(struct intr_frame *f, int n)
+{
+	return *(int *)(f->esp + (4*n));
+}  
