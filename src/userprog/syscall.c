@@ -96,7 +96,7 @@ syscall_handler (struct intr_frame *f)
 			exit(-1);
 			break;
 	}
-	thread_exit();	
+	
 }
 
 void halt(void)
@@ -109,17 +109,16 @@ void exit(int status)
 	struct thread* cur = thread_current();
 	cur->info->ex_status = status;
 	printf("%s: exit(%d)\n", cur->name, status);
+	thread_exit();
 }
 
-pid_t exec(const char *cmd_line){
+pid_t exec(const char *cmd_line)
+{
 	
 }
 
 int wait(pid_t pid)
 {
-	while(1)
-	{
-	}	
 
 }
 
