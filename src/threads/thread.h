@@ -4,6 +4,8 @@
 #include <debug.h>
 #include <list.h>
 #include <stdint.h>
+#include "filesys/file.h"
+#include "filesys/file.c"
 
 typedef int pid_t;
 //for syscall
@@ -17,6 +19,13 @@ struct inf
 	struct lock *wait;
 	struct list_elem elem; 
 };
+
+struct file_inf
+{
+	struct file *file; // Points to the actual file
+	int fd; // File descriptor
+	struct list_elem elem; 
+}; 
 
 /* States in a thread's life cycle. */
 enum thread_status
@@ -112,6 +121,7 @@ struct thread
 
 	struct inf *info; // Information about process 
 	struct list children; // List of child processes
+	struct list files_open; //List of files open by process 
 
 
 #endif
