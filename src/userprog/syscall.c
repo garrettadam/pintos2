@@ -30,54 +30,70 @@ syscall_init (void)
 static void
 syscall_handler (struct intr_frame *f) 
 {
+	printf("System call!");
 	int arg1, arg2, arg3;
 	int sys_num = (*(int *)f->esp);
 	switch(sys_num)
 	{
 		case SYS_HALT:
 			halt();
+			printf("halt");
 			break;
 	
 		case SYS_EXIT:
+			printf("exit");
 			break;
 
 		case SYS_EXEC:
+			printf("execute call");
 			break;
 
 		case SYS_WAIT:
+			printf("wait");
 			break;
 
 		case SYS_CREATE:
+			printf("create");
 			break;
 
 		case SYS_REMOVE:
+			printf("remove");
 			break;
 
 		case SYS_OPEN:
+			printf("open");
 			break;
 
 		case SYS_FILESIZE:
+			printf("filesize");
 			break;
 
 		case SYS_READ:
+			printf("read");
 			break;
 
 		case SYS_WRITE:
+			printf("write");
 			break;
 
 		case SYS_SEEK:
+			printf("seek");
 			break;
 
 		case SYS_TELL:
+			printf("tell");
 			break;
 
 		case SYS_CLOSE:
+			printf("close");
 			break;
 
 		default:
+			printf("default");
 			exit(-1);
 			break;
-	}	
+	}
+	thread_exit();	
 }
 
 void halt(void)
@@ -92,8 +108,8 @@ void exit(int status)
 	printf("%s: exit(%d)\n", cur->name, status);
 }
 
-pid_t exec(const char *cmd_line)
-{
+pid_t exec(const char *cmd_line){
+	
 }
 
 int wait(pid_t pid)

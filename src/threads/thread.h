@@ -5,7 +5,7 @@
 #include <list.h>
 #include <stdint.h>
 #include "filesys/file.h"
-#include "filesys/file.c"
+
 
 typedef int pid_t;
 //for syscall

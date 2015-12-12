@@ -83,6 +83,7 @@ start_process (void *file_name_)
      arguments on the stack in the form of a `struct intr_frame',
      we just point the stack pointer (%esp) to our stack frame
      and jump to it. */
+	printf("Before asm volatile \n");
   asm volatile ("movl %0, %%esp; jmp intr_exit" : : "g" (&if_) : "memory");
   NOT_REACHED ();
 }
@@ -335,7 +336,7 @@ load (const char *file_name, void (**eip) (void), void **esp, char **pointer)
   *eip = (void (*) (void)) ehdr.e_entry;
 
   success = true;
-
+	printf("Load successful");
  done:
   /* We arrive here whether the load is successful or not. */
   file_close (file);
@@ -491,7 +492,6 @@ setup_stack (void **esp, const char* file_name, char** pointer)
 			argv = realloc(argv, argv_size*sizeof(char*));
 		}
 		memcpy(*esp, cur, cur_size);
-		
 		cur = strtok_r(NULL, " " , pointer); //assigns the next token in the command 
 	}
 
@@ -499,8 +499,10 @@ setup_stack (void **esp, const char* file_name, char** pointer)
 
 	// Align to word size (4 bytes)
 	int remainder = (size_t) *esp % 4;      // check to see if esp is a multiple of the word size
-	*esp = *esp - remainder;		// reduce down if it is not fffff i
-	memcpy(*esp, &argv[argc], remainder);
+	if(remainder){
+		*esp = *esp - remainder;		// reduce down if it is not fffff i
+		memcpy(*esp, &argv[argc], remainder);
+	}
 
 	// Push argv[i] for all i
 	int i;
@@ -523,7 +525,7 @@ setup_stack (void **esp, const char* file_name, char** pointer)
 	memcpy(*esp, &argv[argc], sizeof(void *));
 
 	// Free argv
-	//free(argv);
+	free(argv);
 
 	hex_dump(*esp, *esp, PHYS_BASE - *esp, true);
 	printf("Stack setup finished\n");
