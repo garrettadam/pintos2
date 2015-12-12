@@ -96,7 +96,7 @@ syscall_handler (struct intr_frame *f)
 			exit(-1);
 			break;
 	}
-	
+	thread_exit();
 }
 
 void halt(void)
@@ -142,8 +142,8 @@ int read(int fd, void *buffer, unsigned size)
 {
 }
 
-int write(int fd, const void *buffer, unsigned size)
-{
+int write(int fd, const void *buffer, unsigned size){
+
 }
 
 void seek(int fd, unsigned position)

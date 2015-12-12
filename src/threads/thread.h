@@ -10,6 +10,7 @@
 typedef int pid_t;
 //for syscall
 struct lock;
+struct child_p;
 struct inf
 {
 	pid_t pid;
@@ -121,7 +122,12 @@ struct thread
 
 	struct inf *info; // Information about process 
 	struct list children; // List of child processes
-	struct list files_open; //List of files open by process 
+	struct list files_open; //List of files open by process
+	
+      
+	tid_t pp;                      //parent process
+	struct child_p* child;      //child process
+ 
 
 
 #endif
