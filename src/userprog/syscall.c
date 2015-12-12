@@ -4,6 +4,7 @@
 #include "threads/interrupt.h"
 #include "threads/thread.h"
 #include "devices/shutdown.h"
+#include "threads/vaddr.h"
  
 static void syscall_handler (struct intr_frame *);
 // Syscall Function prototypes
