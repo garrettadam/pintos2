@@ -253,7 +253,7 @@ load (const char *file_name, void (**eip) (void), void **esp, char **pointer)
     }
 	printf("Load Test 3\n");
   /* Read and verify executable header. */
-  /*if (file_read (file, &ehdr, sizeof ehdr) != sizeof ehdr
+    if (file_read (file, &ehdr, sizeof ehdr) != sizeof ehdr
       || memcmp (ehdr.e_ident, "\177ELF\1\1\1", 7)
       || ehdr.e_type != 2
       || ehdr.e_machine != 3
@@ -264,43 +264,7 @@ load (const char *file_name, void (**eip) (void), void **esp, char **pointer)
       printf ("load: %s: error loading executable\n", file_name);
       goto done; 
 	
-    }*/
-
-if(file_read (file, &ehdr, sizeof ehdr) != sizeof ehdr){
-	printf("1\n");
-      printf ("load: %s: error loading executable\n", file_name);
-      goto done; 
-}
-if(!memcmp (ehdr.e_ident, "\177ELF\1\1\1", 7)){
-		printf("2\n");
-      printf ("load: %s: error loading executable\n", file_name);
-      goto done; 
-}
-if(ehdr.e_type != 2){
-		printf("3\n");
-      printf ("load: %s: error loading executable\n", file_name);
-      goto done; 
-}
-if(ehdr.e_machine != 3){
-		printf("4\n");
-      printf ("load: %s: error loading executable\n", file_name);
-      goto done; 
-}
-if(ehdr.e_version != 1){
-		printf("5\n");
-      printf ("load: %s: error loading executable\n", file_name);
-      goto done; 
-}
-if(ehdr.e_phentsize != sizeof (struct Elf32_Phdr)){
-		printf("6\n");
-      printf ("load: %s: error loading executable\n", file_name);
-      goto done; 
-}
-if(ehdr.e_phnum > 1024){
-		printf("7\n");
-      printf ("load: %s: error loading executable\n", file_name);
-      goto done; 
-}
+    }
 
 
   /* Read program headers. */
@@ -491,7 +455,7 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
 static bool
 setup_stack (void **esp, const char* file_name, char** pointer) 
 {
-	printf("TEST 1");
+	printf("Setting up stack...\n");
   uint8_t *kpage;
   bool success = false;
 
@@ -507,39 +471,62 @@ setup_stack (void **esp, const char* file_name, char** pointer)
 	}
     }
 	
-	char *cur = strtok_r(NULL, " " , &pointer);
-	char **argv = malloc(2*sizeof(char*));
-	int argc = 0;
-	int argv_size = 2;
-	
-	// set up stack looping through each token (argument) beyond the first
+
+	char *cur = (char *) file_name;         //set the first token to the file_name
+	char **argv = malloc(sizeof(char *)*2); //allocate space for argv 
+	int argc = 0;                           //set argc to index 0
+	int argv_size = 2;                      //size of argv, grows as needed
+	int cur_size;                           //size of the current token
+
+	//iterate through each token past the file_name using the pointer from strtok_r pass from process_execute
 	while(cur != NULL){
-		*esp = *esp - strlen(cur)+1;
+		printf(cur);
+		printf("\n");
+		cur_size = strlen(cur) + 1;
+		*esp = *esp - cur_size;
 		argv[argc] = *esp;
 		argc = argc +1;
-		if(argc >= argv_size){
-			argv_size = argv_size * 2;
+		if(argc >= argv_size){		//reallocate if you run out of space
+			argv_size = argv_size + 4;
 			argv = realloc(argv, argv_size*sizeof(char*));
 		}
-		memcpy(*esp, cur, strlen(cur) + 1);
-
-		cur = strtok_r(NULL, " " , &pointer);
+		memcpy(*esp, cur, cur_size);
+		
+		cur = strtok_r(NULL, " " , pointer); //assigns the next token in the command 
 	}
 
+	argv[argc] = 0;
+
+	// Align to word size (4 bytes)
+	int remainder = (size_t) *esp % 4;      // check to see if esp is a multiple of the word size
+	*esp = *esp - remainder;		// reduce down if it is not fffff i
+	memcpy(*esp, &argv[argc], remainder);
+
+	// Push argv[i] for all i
+	int i;
+	for (i = argc; i >= 0; i--){
+		*esp = *esp - sizeof(char *);
+		memcpy(*esp, &argv[i], sizeof(char *));
+	}
+	
+	// Push argv
 	cur = *esp;
 	*esp = *esp - sizeof(char **);
 	memcpy(*esp, &cur, sizeof(char **));
 
+	// Push argc
 	*esp = *esp - sizeof(int);
 	memcpy(*esp, &argc, sizeof(int));
 
+	// Push fake return addr
 	*esp = *esp - sizeof(void *);
-	memcpy(*esp, &argv[argc], sizeof(void*));
+	memcpy(*esp, &argv[argc], sizeof(void *));
 
-	free(argv);
-	
+	// Free argv
+	//free(argv);
+
 	hex_dump(*esp, *esp, PHYS_BASE - *esp, true);
-	printf("TEST 2");
+	printf("Stack setup finished\n");
 	
 	return success;
 
