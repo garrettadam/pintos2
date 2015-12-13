@@ -22,7 +22,6 @@ void seek(int fd, unsigned position);
 unsigned tell(int fd);
 void close(int fd);
 // Helper function prototypes
-bool is_valid_ptr(const void *vaddr); // Checks to see that ptr is pointing to user space addr
 int argument(struct intr_frame *f, int num);// Gets argument from stack, num is the argument number 1-3
 void
 syscall_init (void) 
@@ -169,20 +168,6 @@ unsigned tell(int fd)
 
 void close(int fd)
 {
-}
-
-// Checks to see if pointer is valid  
-bool is_valid_ptr(const void *vaddr)
-{
-	if(is_user_vaddr(vaddr))
-	{
-		return true;
-	}
-
-	else
-	{
-		return false;
-	}
 }
 
 // Gets argument data from stack

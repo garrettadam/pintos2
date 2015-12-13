@@ -8,19 +8,18 @@
 
 
 typedef int pid_t;
-//for syscall
-struct lock;
-struct inf
+
+struct inf //Information about a process
 {
-	pid_t pid;
-	bool waiting;
-	bool exited;
-	int ex_status;
-	struct lock *wait;
-	struct list_elem elem; 
+	pid_t pid; // Process ID
+	bool exited; // True if process has exited, False if process is still alive
+	int ex_status; // Exit status of the process
+	struct sema loading; // Semaphore used to communicate load status to parent
+	int load_status; // Load status of process 
+	struct list_elem elem;  
 };
 
-struct file_inf
+struct file_inf // Information about file to be stored in list of open files 
 {
 	struct file *file; // Points to the actual file
 	int fd; // File descriptor
