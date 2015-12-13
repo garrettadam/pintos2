@@ -100,14 +100,29 @@ start_process (void *file_name_)
 int
 process_wait (tid_t child_tid UNUSED) 
 {
+
+
 	printf("Process is waiting\n");
 	// child process stuff
 	//temporary infinite loop
 	bool tmp = true;
 	while(tmp){
 	}
+
   return -1;
 }
+
+/*struct child_p* get_child(int pid){
+	struct thread *cur = thread_current();
+	struct list_elem *element;
+	for(element = list_begin(&cur->children); element != list_end(&cur->children); element = list_next(element)){
+		struct child_p *child = list_entry(element, struct children, elem);
+		if(pid == child->pid){
+			return child;
+		}
+	}
+	return NULL;
+}*/
 
 /* Free the current process's resources. */
 void
